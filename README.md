@@ -13,7 +13,7 @@
     <a href="https://www.buymeacoffee.com/gabrielzschmitz" target="_blank">
         <img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 20px !important;width: 87px;">
     </a>
-    <a href="https://github.com/gabrielzschmitz/bujoshell">
+    <a href="https://github.com/gabrielzschmitz/Pendulum-Tracker">
         <img src="https://img.shields.io/github/stars/gabrielzschmitz/Pendulum-Tracker?style=social" alt="Give me a Star">
     </a>
 </p>
