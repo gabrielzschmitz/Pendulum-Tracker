@@ -1,0 +1,24 @@
+hMin: 0
+hMin_green: 41
+hMin_yellow:21
+hMin_magenta: 131
+hMax: 22
+hMax_green: 88
+hMax_yellow:179
+hMax_magenta: 148
+sMin: 183
+sMin_green: 103
+sMin_yellow:140
+sMin_magenta: 54
+sMax: 254
+sMax_green: 255
+sMax_yellow:255
+sMax_magenta: 255
+vMin: 148
+vMin_green: 47
+vMin_yellow:111
+vMin_magenta: 105
+vMax: 255
+vMax_green: 255
+vMax_yellow:255
+vMax_magenta: 255

@@ -1,0 +1,7 @@
+Ratio: 0.0
+Length: 0.0
+Point 0 X: 0
+Point 0 Y: 0
+Current Point X: 0
+Current Point Y: 0
+Flag: 0
