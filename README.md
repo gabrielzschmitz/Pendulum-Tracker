@@ -38,7 +38,8 @@ $ python3 run.py
 $ deactivate
 ```
 
-And open `localhost:8050` at your browser!
+And open `localhost:8050` at one browser and `localhost:8050/dashboard` at
+another!
 
 **Note**: first install all the _dependencies_!
 
