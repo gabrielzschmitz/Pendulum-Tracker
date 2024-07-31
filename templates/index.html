@@ -1,0 +1,539 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+    <link href='https://fonts.googleapis.com/css?family=Work+Sans' rel='stylesheet'>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static',
+               filename='pendulum-16.ico') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Pendulum Tracking</title>
+  </head>
+  <body>
+    <!-- Header -->
+    <header>
+      <!-- Page Title -->
+      <img class="logo" src="{{ url_for('static', filename='pendulum-66.png') }}"
+                        alt="Pendulum Logo">
+      <h1 class="title">Pendulum Tracking</h1>
+
+      <!-- Dark mode toggle button -->
+      <button id="darkModeButton" class="dark-mode-toggle" type="button" onclick="toggleDarkMode()">☀️</button>
+    </header>
+
+    <main>
+      <!-- Container Left -->
+      <div class="container-left">
+        <!-- Video Feed -->
+        <div class="camera">
+          <img class="video-feed" src="{{ url_for('video_feed') }}">
+        </div>
+
+        <!-- Display Countdown -->
+        <div id="countdown-container">
+          Countdown: <span id="countdown">{{ countdown_time }}</span>
+        </div>
+
+        <!-- Commands -->
+        <div class="commands">
+          <!-- Form: Cycle Camera -->
+          <form action="{{ url_for('submit_command') }}" method="post">
+            <input type="hidden" name="command" value="cycle">
+            <button class="command-button" type="submit">Cycle Camera</button>
+          </form>
+          <!-- Form: Quit -->
+          <form action="{{ url_for('submit_command') }}" method="post">
+            <input type="hidden" name="command" value="quit">
+            <button class="command-button" type="submit">Quit</button>
+          </form>
+          <!-- Form: Start Tracking -->
+          <form action="{{ url_for('submit_command') }}" method="post">
+            <input type="hidden" name="command" value="{% if tracking_flag %}stop_tracking{% else %}start_tracking{% endif %}">
+            <button class="command-start-button {{ button_class }}" type="submit">
+              {{ button_text }}
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Container Right -->
+      <div class="container-right">
+        <div class="color-range-selector-carousel">
+          <div class="color-dot" data-color="base" onclick="changeColorRange('base')"></div>
+          <div class="color-dot" data-color="green" onclick="changeColorRange('green')"></div>
+          <div class="color-dot" data-color="yellow" onclick="changeColorRange('yellow')"></div>
+          <div class="color-dot" data-color="magenta" onclick="changeColorRange('magenta')"></div>
+        </div>
+        <!-- HSV Trackbars Form -->
+        <form id="hsvForm">
+          <!-- Add this code to the HSV Trackbars Form section -->
+          <form id="hsvForm">
+            <!-- Colors selector -->
+          <div class="column">
+            <!-- Min Sliders -->
+            <div class="slider-box">
+              <div id="hsv_base">
+                <label for="hMin">Hue Min:</label>
+                <div class="slider">
+                  <input type="range" id="hMin" name="hMin" min="0" max="179" value="{{ hMin }}">
+                </div>
+                <div id="hMinValue" class="slider-value">{{ hMin }}</div>
+              </div>
+              <div id="hsv_green">
+                <label for="hMin_green">Hue Min:</label>
+                <div class="slider">
+                  <input type="range" id="hMin_green" name="hMin_green" min="0" max="179" value="{{ hMin_green }}">
+                </div>
+                <div id="hMin_greenValue" class="slider-value">{{ hMin_green }}</div>
+              </div>
+              <div id="hsv_yellow">
+                <label for="hMin_yellow">Hue Min:</label>
+                <div class="slider">
+                  <input type="range" id="hMin_yellow" name="hMin_yellow" min="0" max="179" value="{{ hMin_yellow }}">
+                </div>
+                <div id="hMin_yellowValue" class="slider-value">{{ hMin_yellow }}</div>
+              </div>
+              <div id="hsv_magenta">
+                <label for="hMin_magenta">Hue Min:</label>
+                <div class="slider">
+                  <input type="range" id="hMin_magenta" name="hMin_magenta" min="0" max="179" value="{{ hMin_magenta }}">
+                </div>
+                <div id="hMin_magentaValue" class="slider-value">{{ hMin_magenta }}</div>
+              </div>
+            </div>
+
+            <div class="slider-box">
+              <div id="hsv_base">
+                <label for="sMin">Saturation Min:</label>
+                <div class="slider">
+                  <input type="range" id="sMin" name="sMin" min="0" max="255" value="{{ sMin }}">
+                </div>
+                <div id="sMinValue" class="slider-value">{{ sMin }}</div>
+              </div>
+              <div id="hsv_green">
+                <label for="sMin_green">Saturation Min:</label>
+                <div class="slider">
+                  <input type="range" id="sMin_green" name="sMin_green" min="0" max="255" value="{{ sMin_green }}">
+                </div>
+                <div id="sMin_greenValue" class="slider-value">{{ sMin_green }}</div>
+              </div>
+              <div id="hsv_yellow">
+                <label for="sMin_yellow">Saturation Min:</label>
+                <div class="slider">
+                  <input type="range" id="sMin_yellow" name="sMin_yellow" min="0" max="255" value="{{ sMin_yellow }}">
+                </div>
+                <div id="sMin_yellowValue" class="slider-value">{{ sMin_yellow }}</div>
+              </div>
+              <div id="hsv_magenta">
+                <label for="sMin_magenta">Saturation Min:</label>
+                <div class="slider">
+                  <input type="range" id="sMin_magenta" name="sMin_magenta" min="0" max="255" value="{{ sMin_magenta }}">
+                </div>
+                <div id="sMin_magentaValue" class="slider-value">{{ sMin_magenta }}</div>
+              </div>
+            </div>
+
+            <div class="slider-box">
+              <div id="hsv_base">
+                <label for="vMin">Value Min:</label>
+                <div class="slider">
+                  <input type="range" id="vMin" name="vMin" min="0" max="255" value="{{ vMin }}">
+                </div>
+                <div id="vMinValue" class="slider-value">{{ vMin }}</div>
+              </div>
+              <div id="hsv_green">
+                <label for="vMin_green">Value Min:</label>
+                <div class="slider">
+                  <input type="range" id="vMin_green" name="vMin_green" min="0" max="255" value="{{ vMin_green }}">
+                </div>
+                <div id="vMin_greenValue" class="slider-value">{{ vMin_green }}</div>
+              </div>
+              <div id="hsv_yellow">
+                <label for="vMin_yellow">Value Min:</label>
+                <div class="slider">
+                  <input type="range" id="vMin_yellow" name="vMin_yellow" min="0" max="255" value="{{ vMin_yellow }}">
+                </div>
+                <div id="vMin_yellowValue" class="slider-value">{{ vMin_yellow }}</div>
+              </div>
+              <div id="hsv_magenta">
+                <label for="vMin_magenta">Value Min:</label>
+                <div class="slider">
+                  <input type="range" id="vMin_magenta" name="vMin_magenta" min="0" max="255" value="{{ vMin_magenta }}">
+                </div>
+                <div id="vMin_magentaValue" class="slider-value">{{ vMin_magenta }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="column">
+            <!-- Max Sliders -->
+            <div class="slider-box">
+              <div id="hsv_base">
+                <label for="hMax">Hue Max:</label>
+                <div class="slider">
+                  <input type="range" id="hMax" name="hMax" min="0" max="179" value="{{ hMax }}">
+                </div>
+                <div id="hMaxValue" class="slider-value">{{ hMax }}</div>
+              </div>
+              <div id="hsv_green">
+                <label for="hMax_green">Hue Max:</label>
+                <div class="slider">
+                  <input type="range" id="hMax_green" name="hMax_green" min="0" max="179" value="{{ hMax_green }}">
+                </div>
+                <div id="hMax_greenValue" class="slider-value">{{ hMax_green }}</div>
+              </div>
+              <div id="hsv_yellow">
+                <label for="hMax_yellow">Hue Max:</label>
+                <div class="slider">
+                  <input type="range" id="hMax_yellow" name="hMax_yellow" min="0" max="179" value="{{ hMax_yellow }}">
+                </div>
+                <div id="hMax_yellowValue" class="slider-value">{{ hMax_yellow }}</div>
+              </div>
+              <div id="hsv_magenta">
+                <label for="hMax_magenta">Hue Max:</label>
+                <div class="slider">
+                  <input type="range" id="hMax_magenta" name="hMax_magenta" min="0" max="179" value="{{ hMax_magenta }}">
+                </div>
+                <div id="hMax_magentaValue" class="slider-value">{{ hMax_magenta }}</div>
+              </div>
+            </div>
+
+            <div class="slider-box">
+              <div id="hsv_base">
+                <label for="sMax">Saturation Max:</label>
+                <div class="slider">
+                  <input type="range" id="sMax" name="sMax" min="0" max="255" value="{{ sMax }}">
+                </div>
+                <div id="sMaxValue" class="slider-value">{{ sMax }}</div>
+              </div>
+              <div id="hsv_green">
+                <label for="sMax_green">Saturation Max:</label>
+                <div class="slider">
+                  <input type="range" id="sMax_green" name="sMax_green" min="0" max="255" value="{{ sMax_green }}">
+                </div>
+                <div id="sMax_greenValue" class="slider-value">{{ sMax_green }}</div>
+              </div>
+              <div id="hsv_yellow">
+                <label for="sMax_yellow">Saturation Max:</label>
+                <div class="slider">
+                  <input type="range" id="sMax_yellow" name="sMax_yellow" min="0" max="255" value="{{ sMax_yellow }}">
+                </div>
+                <div id="sMax_yellowValue" class="slider-value">{{ sMax_yellow }}</div>
+              </div>
+              <div id="hsv_magenta">
+                <label for="sMax_magenta">Saturation Max:</label>
+                <div class="slider">
+                  <input type="range" id="sMax_magenta" name="sMax_magenta" min="0" max="255" value="{{ sMax_magenta }}">
+                </div>
+                <div id="sMax_magentaValue" class="slider-value">{{ sMax_magenta }}</div>
+              </div>
+            </div>
+
+            <div class="slider-box">
+              <div id="hsv_base">
+                <label for="vMax">Value Max:</label>
+                <div class="slider">
+                  <input type="range" id="vMax" name="vMax" min="0" max="255" value="{{ vMax }}">
+                </div>
+                <div id="vMaxValue" class="slider-value">{{ vMax }}</div>
+              </div>
+              <div id="hsv_green">
+                <label for="vMax_green">Value Max:</label>
+                <div class="slider">
+                  <input type="range" id="vMax_green" name="vMax_green" min="0" max="255" value="{{ vMax_green }}">
+                </div>
+                <div id="vMax_greenValue" class="slider-value">{{ vMax_green }}</div>
+              </div>
+              <div id="hsv_yellow">
+                <label for="vMax_yellow">Value Max:</label>
+                <div class="slider">
+                  <input type="range" id="vMax_yellow" name="vMax_yellow" min="0" max="255" value="{{ vMax_yellow }}">
+                </div>
+                <div id="vMax_yellowValue" class="slider-value">{{ vMax_yellow }}</div>
+              </div>
+              <div id="hsv_magenta">
+                <label for="vMax_magenta">Value Max:</label>
+                <div class="slider">
+                  <input type="range" id="vMax_magenta" name="vMax_magenta" min="0" max="255" value="{{ vMax_magenta }}">
+                </div>
+                <div id="vMax_magentaValue" class="slider-value">{{ vMax_magenta }}</div>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </main>
+
+    <!-- Copyright -->
+    <footer>
+      <div class="copyright">
+        <p>
+        © 2023 – Pendulum Tracker by
+        <a href="https://www.github.com/gabrielzschmitz">gabrielzschmitz</a>
+        and
+        <a href="https://github.com/vtnpog">vtn</a>.
+        </p>
+      </div>
+    </footer>
+
+
+    <!-- JavaScript -->
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        // Retrieve the selected value from localStorage
+        var storedValue = localStorage.getItem('selectedColorRange');
+
+        // Update the color range selector on page load with the stored value
+        var colorDot = document.querySelector('.color-dot[data-color="' + (storedValue || 'base') + '"]');
+        colorDot.classList.add('selected');
+
+        // Trigger the changeColorRange function to set up the page based on the selected value
+        changeColorRange(storedValue || 'base');
+      });
+
+      function changeColorRange(selectedColor) {
+        // Remove the "selected" class from all color dots
+        var colorDots = document.querySelectorAll('.color-dot');
+        colorDots.forEach(function(dot) {
+          dot.classList.remove('selected');
+        });
+
+        // Add the "selected" class to the clicked color dot
+        var selectedDot = document.querySelector(`[data-color="${selectedColor}"]`);
+        selectedDot.classList.add('selected');
+
+        // Get all color range elements for each slider type
+        var hueSliders = document.querySelectorAll('[id^="hsv_"]');
+        var satSliders = document.querySelectorAll('[id^="ssv_"]');
+        var valSliders = document.querySelectorAll('[id^="vsv_"]');
+
+        // Hide all sliders initially
+        hueSliders.forEach(function (slider) {
+          slider.style.display = 'none';
+        });
+
+        satSliders.forEach(function (slider) {
+          slider.style.display = 'none';
+        });
+
+        valSliders.forEach(function (slider) {
+          slider.style.display = 'none';
+        });
+
+        // Show the sliders based on the selected option
+        if (selectedColor === 'base') {
+          hueSliders.forEach(function (slider) {
+            if (slider.id.includes('_base')) {
+              slider.style.display = 'block';
+            }
+          });
+        } else if (selectedColor === 'green') {
+          hueSliders.forEach(function (slider) {
+            if (slider.id.includes('_green')) {
+              slider.style.display = 'block';
+            }
+          });
+        } else if (selectedColor === 'yellow') {
+          hueSliders.forEach(function (slider) {
+            if (slider.id.includes('_yellow')) {
+              slider.style.display = 'block';
+            }
+          });
+        } else if (selectedColor === 'magenta') {
+          hueSliders.forEach(function (slider) {
+            if (slider.id.includes('_magenta')) {
+              slider.style.display = 'block';
+            }
+          });
+        }
+
+        // Get all color dots
+        var colorDots = document.querySelectorAll('.color-dot');
+
+        // Remove 'selected' class from all color dots
+        colorDots.forEach(function (dot) {
+          dot.classList.remove('selected');
+        });
+
+        // Add 'selected' class to the clicked color dot
+        var selectedDot = document.querySelector('.color-dot[data-color="' + selectedColor + '"]');
+        selectedDot.classList.add('selected');
+
+        // Send the selected color range to the server
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/update_selected_color', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        var data = 'selectedColor=' + selectedColor;
+        xhr.send(data);
+
+        // Set the selected option based on the server's selected_color_range
+        localStorage.setItem('selectedColorRange', selectedColor);
+      }
+
+      // Sliders progress updater
+      for (let e of document.querySelectorAll('input[type="range"].slider-progress')) {
+        e.style.setProperty('--value', e.value);
+        e.style.setProperty('--min', e.min == '' ? '0' : e.min);
+        e.style.setProperty('--max', e.max == '' ? '100' : e.max);
+        e.addEventListener('input', () => e.style.setProperty('--value', e.value));
+      }
+
+      function toggleDarkMode() {
+        var button = document.getElementById("darkModeButton");
+        if (button.textContent === "☀️") {
+          button.textContent = "🌙";
+        } else {
+          button.textContent = "☀️";
+        }
+
+        var element = document.body;
+        var allElements = document.getElementsByTagName("*");
+
+        // Toggle the dark-mode class for the body
+        element.classList.toggle('dark-mode');
+
+        // Toggle the dark-mode class for all elements
+        for (var i = 0; i < allElements.length; i++) {
+          allElements[i].classList.toggle('dark-mode', element.classList.contains('dark-mode'));
+        }
+
+        updateHSV();
+
+        // Save the dark mode state to localStorage
+        localStorage.setItem('darkMode', element.classList.contains('dark-mode'));
+      }
+
+      // Check if dark mode was previously set
+      var isDarkMode = localStorage.getItem('darkMode') === 'true';
+
+      // Set dark mode based on the stored state
+      if (isDarkMode) {
+        toggleDarkMode(); // Call toggleDarkMode to apply the class on page load
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Update HSV value display when sliders change
+        var sliders = document.querySelectorAll('input[type="range"]');
+        sliders.forEach(function (slider) {
+          slider.addEventListener('input', function () {
+            var sliderId = this.id;
+            var valueId = sliderId + 'Value';
+            document.getElementById(valueId).textContent = this.value;
+
+            updateHSV();
+          });
+        });
+      });
+
+      // Update HSV dynamically
+      function updateHSV() {
+        var hMin = document.getElementById('hMin').value;
+        var hMax = document.getElementById('hMax').value;
+        var sMin = document.getElementById('sMin').value;
+        var sMax = document.getElementById('sMax').value;
+        var vMin = document.getElementById('vMin').value;
+        var vMax = document.getElementById('vMax').value;
+        var hMin_green = document.getElementById('hMin_green').value;
+        var hMax_green = document.getElementById('hMax_green').value;
+        var sMin_green = document.getElementById('sMin_green').value;
+        var sMax_green = document.getElementById('sMax_green').value;
+        var vMin_green = document.getElementById('vMin_green').value;
+        var vMax_green = document.getElementById('vMax_green').value;
+        var hMin_yellow = document.getElementById('hMin_yellow').value;
+        var hMax_yellow = document.getElementById('hMax_yellow').value;
+        var sMin_yellow = document.getElementById('sMin_yellow').value;
+        var sMax_yellow = document.getElementById('sMax_yellow').value;
+        var vMin_yellow = document.getElementById('vMin_yellow').value;
+        var vMax_yellow = document.getElementById('vMax_yellow').value;
+        var hMin_magenta = document.getElementById('hMin_magenta').value;
+        var hMax_magenta = document.getElementById('hMax_magenta').value;
+        var sMin_magenta = document.getElementById('sMin_magenta').value;
+        var sMax_magenta = document.getElementById('sMax_magenta').value;
+        var vMin_magenta = document.getElementById('vMin_magenta').value;
+        var vMax_magenta = document.getElementById('vMax_magenta').value;
+
+        var xhr = new XMLHttpRequest();
+        xhr.open('POST', '/update_hsv', true);
+        xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState == 4 && xhr.status == 200) {
+            // You can optionally update the display or perform other actions
+          }
+        };
+        var data = 'hMin=' + hMin + '&hMax=' + hMax + '&sMin=' + sMin +
+          '&sMax=' + sMax + '&vMin=' + vMin + '&vMax=' + vMax +
+          '&hMin_green=' +hMin_green + '&hMax_green=' + hMax_green +
+          '&sMin_green=' + sMin_green + '&sMax_green=' + sMax_green +
+          '&vMin_green=' + vMin_green + '&vMax_green=' + vMax_green +
+          '&hMin_yellow=' + hMin_yellow + '&hMax_yellow=' + hMax_yellow +
+          '&sMin_yellow=' + sMin_yellow + '&sMax_yellow=' + sMax_yellow +
+          '&vMin_yellow=' + vMin_yellow + '&vMax_yellow=' + vMax_yellow +
+          '&hMin_magenta=' + hMin_magenta + '&hMax_magenta=' + hMax_magenta +
+          '&sMin_magenta=' + sMin_magenta + '&sMax_magenta=' + sMax_magenta +
+          '&vMin_magenta=' + vMin_magenta + '&vMax_magenta=' + vMax_magenta;
+        xhr.send(data);
+      }
+
+      function updateCountdown() {
+        // Make an asynchronous GET request to the /get_countdown route
+        fetch("/get_countdown")
+          .then(response => response.json())
+          .then(data => {
+            const countdownValue = data.countdown_time;
+
+            // Check if countdown_time is between 5 and 0
+            if (countdownValue >= 0 && countdownValue <= 5) {
+              // Display the countdown container
+              document.getElementById("countdown-container").style.display = "block";
+
+              // Update the countdown display on the page
+              document.getElementById("countdown").textContent = countdownValue;
+            } else {
+              // Hide the countdown container if countdown_time is not in the range
+              document.getElementById("countdown-container").style.display = "none";
+            }
+
+            // If countdown is still running, schedule the next update after 1 second
+            if (countdownValue > 0) {
+              setTimeout(updateCountdown, 1000);
+            }
+          })
+          .catch(error => {
+            console.error("Error updating countdown:", error);
+          });
+      }
+
+      // Call the updateCountdown function when the page is loaded
+      document.addEventListener("DOMContentLoaded", function () {
+        updateCountdown();
+      });
+
+      // Function to toggle button text and color
+      function toggleTrackingButton() {
+        var button = document.getElementById("tracking-button");
+        if (button.innerHTML === "Start Tracking") {
+          button.innerHTML = "Stop Tracking";
+          button.style.backgroundColor = "red";
+        } else {
+          button.innerHTML = "Start Tracking";
+          button.style.backgroundColor = ""; // Reset to default background color
+        }
+      }
+
+      // Fetch initial tracking state and set the button
+      fetch("/get_tracking_state")
+        .then(response => response.text())
+        .then(state => {
+          var button = document.getElementById("tracking-button");
+          if (state === "started") {
+            button.innerHTML = "Stop Tracking";
+            button.style.backgroundColor = "red";
+          }
+        });
+
+    </script>
+
+  </body>
+</html>
